@@ -1,8 +1,12 @@
 package com.tcapps.hearthtools.fragment;
 
 import android.app.Activity;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,23 +15,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.tcapps.hearthtools.R;
 import com.tcapps.hearthtools.activity.MainActivity;
+import com.tcapps.hearthtools.adapter.DeckListAdapter;
 import com.tcapps.hearthtools.application.HearthToolsApplication;
 import com.tcapps.hearthtools.database.cursor.DeckCursor;
 import com.tcapps.hearthtools.database.dao.DeckDao;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
+
+import static com.tcapps.hearthtools.util.ViewUtil.dipToPixels;
 
 public class DeckListFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private TextView mDeckName;
-    private TextView mDeckClass;
-    private EditText mDeckNameInput;
-    private EditText mDeckClassInput;
-    private Button mAdd;
-    private Button mRefresh;
-
+    private RecyclerView mDeckList;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Inject DeckDao mDeckDao;
 
@@ -48,30 +52,40 @@ public class DeckListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.card_view_deck, container, false);
+        mDeckList = (RecyclerView) inflater.inflate(R.layout.card_view_deck, container, false);
 
-        mDeckName = (TextView) rootView.findViewById(R.id.deck_name);
-        mDeckClass = (TextView) rootView.findViewById(R.id.deck_class);
-        mDeckNameInput = (EditText) rootView.findViewById(R.id.deck_name_input);
-        mDeckClassInput = (EditText) rootView.findViewById(R.id.deck_class_input);
-        mAdd = (Button) rootView.findViewById(R.id.add_deck);
-        mRefresh = (Button) rootView.findViewById(R.id.refresh);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mDeckList.setLayoutManager(mLayoutManager);
 
-        mAdd.setOnClickListener(new View.OnClickListener() {
+        ArrayList<Object> data = new ArrayList<>();
+
+        for (int i = 0; i < 100; i++) {
+            data.add(new Object());
+        }
+
+        mDeckList.setAdapter(new DeckListAdapter(data));
+
+        mDeckList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public void onClick(View v) {
-                addDeckToDatabase();
+            public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                super.onDrawOver(c, parent, state);
+            }
+
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                super.onDraw(c, parent, state);
+            }
+
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+
+                outRect.bottom += dipToPixels(getActivity(), 10);
+                outRect.top += dipToPixels(getActivity(), 10);
             }
         });
 
-        mRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                readFromDatabase();
-            }
-        });
-
-        return rootView;
+        return mDeckList;
     }
 
     @Override
@@ -81,19 +95,4 @@ public class DeckListFragment extends Fragment {
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
     }
 
-    private void addDeckToDatabase() {
-        mDeckDao.insertDeck(mDeckNameInput.getText().toString(), mDeckClassInput.getText().toString());
-    }
-
-    private void readFromDatabase() {
-        DeckCursor cursor = mDeckDao.readDecks();
-        int count = cursor.getCount();
-
-        if (cursor.moveToPosition(count - 1)) {
-            mDeckName.setText(cursor.readName());
-            mDeckClass.setText(cursor.readDeckType());
-        }
-
-        cursor.close();
-    }
 }
