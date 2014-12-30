@@ -63,7 +63,7 @@ public class DeckListFragment extends Fragment {
             data.add(new Object());
         }
 
-        mDeckList.setAdapter(new DeckListAdapter(data));
+        mDeckList.setAdapter(new DeckListAdapter(data, (DeckListAdapter.Callback) getActivity()));
 
         mDeckList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -93,6 +93,9 @@ public class DeckListFragment extends Fragment {
         super.onAttach(activity);
 
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    public interface Callback extends DeckListAdapter.Callback {
     }
 
 }

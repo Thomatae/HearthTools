@@ -1,5 +1,6 @@
 package com.tcapps.hearthtools.adapter;
 
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,13 +15,15 @@ import java.util.ArrayList;
 public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHolder> {
 
     private ArrayList<Object> mData;
+    private Callback mCallback;
 
-    public DeckListAdapter(ArrayList<Object> data) {
+    public DeckListAdapter(ArrayList<Object> data, Callback callback) {
         mData = data;
+        mCallback = callback;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int index) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         CardView row = (CardView) LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_deck_list, viewGroup, false);
 
         return new ViewHolder(row);
@@ -40,7 +43,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         return mData.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView deckName;
         public TextView deckClass;
@@ -52,7 +55,17 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             deckName = (TextView) itemView.findViewById(R.id.deck_name);
             deckClass = (TextView) itemView.findViewById(R.id.deck_class);
             winLossRatio = (TextView) itemView.findViewById(R.id.win_loss_ratio);
+
+            itemView.setOnClickListener(this);
         }
 
+        @Override
+        public void onClick(View view) {
+            mCallback.onDeckClicked(getPosition());
+        }
+    }
+
+    public interface Callback {
+        void onDeckClicked(int position);
     }
 }

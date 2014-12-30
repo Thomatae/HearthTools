@@ -1,23 +1,34 @@
 package com.tcapps.hearthtools.activity;
 
 import android.app.Activity;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.transition.Explode;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+
+import com.tcapps.hearthtools.fragment.DeckDetailsFragment;
 import com.tcapps.hearthtools.fragment.DeckListFragment;
 import com.tcapps.hearthtools.fragment.NavigationDrawerFragment;
 import com.tcapps.hearthtools.R;
 
+import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+
+public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+                                                               DeckListFragment.Callback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -102,6 +113,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDeckClicked(int position) {
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, DeckDetailsFragment.newInstance(position))
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
